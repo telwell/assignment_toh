@@ -1,5 +1,3 @@
-require 'pry'
-
 class TowerOfHanoi
 	# Set the initial height of the tower
 	def initialize(height)
@@ -10,25 +8,95 @@ class TowerOfHanoi
 
 	# Play method
 	def play
-		puts "This will start the game"
-		self.render
-		until is_victory? || quit?
-			puts "Enter your move:"
-			@move = gets.chomp
-		end
+		# Start the error message off as nothing
+		error_message = nil
 
+		# Initiate move counter
+		total_moves = 0
+		puts "Let the game begin!!!\nEnter the column you want to move from\nthen the column you want to move to.\nComma separated like: _,_\nEnjoy!\n\n"
+		until is_victory?
+			self.render
+			# Display error message if there is one
+			if error_message
+				puts "#{error_message}"
+			else
+				puts "Enter your move:"
+			end
+
+			# Get move from user
+			@move = gets.chomp
+
+			# Quit the game if user inputs Quit or q
+			if quit?
+				break
+			end
+
+			# Take the input and converting it from a 
+			# string to an array. 
+			@move = @move.split(",").map { |s| s.to_i }
+
+			if valid_input?
+				@move_from, @move_to = @move[0]-1, @move[1]-1
+				if valid_move?
+					temp = @board[@move_from].shift
+					@board[@move_to].unshift(temp)
+					error_message = nil
+					total_moves += 1
+				else
+					error_message = "Oops! That's an illegal move. Try again!"
+					redo
+				end
+			else
+				error_message = "Invalid input, please enter in the form of _,_ and ensure\nyou're only using numbers between 1-3!"
+				redo
+			end
+		end
 
 		# Leave a message when the game ends
-		if is_victory?
-			puts "You win! Congratulations!"
+		self.render
+		puts "You win! Congratulations!\nIt only took you #{total_moves} moves!"
+	end
+
+	# Check to see if the input itself is in
+	# a proper format.
+	def valid_input?
+		if @move.length == 2
+			@move.each do |input|
+				if input.nil? || input < 1 || input > 3
+					return false
+				end
+			end
 		else
-			puts "Thanks for playing!"
+			return false
 		end
+		return true
+	end
+
+	# Check to see if the move is valid
+	def valid_move?
+		# Now let's make sure all of the moves are valid.
+		# I'll do this by seeing if the sorted version of each
+		# column equals the @board version.
+		temp_board = Marshal.load(Marshal.dump(@board))
+		temp = temp_board[@move_from].shift
+		temp_board[@move_to].unshift(temp)
+
+		temp_board.each do |column|
+			if column.sort != column
+				return false
+			end
+		end
+		# If they all pass, we're good!
+		return true
 	end
 
 	# Did we win?
 	def is_victory?
-
+		if @board[2].length == @height
+			true
+		else
+			false
+		end
 	end
 
 	# Did the user quit?
