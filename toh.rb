@@ -42,6 +42,7 @@ class TowerOfHanoi
 					@board[@move_to].unshift(temp)
 					error_message = nil
 					total_moves += 1
+					system "clear"
 				else
 					error_message = "Oops! That's an illegal move. Try again!"
 					redo
@@ -53,8 +54,12 @@ class TowerOfHanoi
 		end
 
 		# Leave a message when the game ends
-		self.render
-		puts "You win! Congratulations!\nIt only took you #{total_moves} moves!"
+		if is_victory?			
+			self.render
+			puts "You win! Congratulations!\nIt only took you #{total_moves} moves!"
+		else
+			puts "You quit. Thanks for playing!"
+		end
 	end
 
 	# Check to see if the input itself is in
@@ -110,7 +115,6 @@ class TowerOfHanoi
 	# It will be represented as a nested array with board[0] being the 
 	# left-most peg and board[2] being the right-most peg.
 	def render
-		# binding.pry
 		# First let's create an output buffer. This will be 
 		# where all of our output lines are stored.
 		output_buffer = ""
@@ -126,7 +130,7 @@ class TowerOfHanoi
 				# (which is also the max width) + 1.
 				temp_buffer = ""
 
-				# We're only going to add o's if there s number on the board.
+				# We're only going to add o's if there are numbers in the column.
 				if @board[column][-row]
 					@board[column][-row].times {temp_buffer << "o"}
 				end
